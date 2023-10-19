@@ -3,6 +3,8 @@ import { ScrollContext } from './core'
 
 import { motion } from "framer-motion"
 
+import { spring } from 'framer-motion'
+
 interface PageSizeProps {
     children: React.ReactNode
 }
@@ -41,8 +43,8 @@ export default function PageSizeCore(
 
     return <motion.div
         ref={ref}
-        animate={direction === 'y' ? { top: -y } : { left: -x }}
-        transition={{ ease: [0.07, 0.82, 0.35, 1], duration: 1 }}
+        animate={direction === 'y' ? { y: -y } : { x: -x }}
+        transition={{ ease: [0.07, 0.82, 0.35, 1], duration: 1.5 }}
         style={{
             position: 'relative'
         }}
