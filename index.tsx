@@ -86,6 +86,27 @@ function CoreScroll({
         return () => --totalScrollbars as any
     }, [])
 
+
+    const handlerScroll = (
+        { currentTarget }: { currentTarget: HTMLDivElement }
+    ) => {
+        if (props.direction !== direction)
+            return
+
+        if (new Date().getTime() - setDefault.id < 2)
+            return
+
+        setDefault = {
+            id: new Date().getTime(),
+            children: currentTarget
+        }
+
+        setValue(prev => {
+            prev.id = String(id)
+            return { ...prev }
+        })
+    }
+
     return <ScrollContext.Provider value={{ props, setProps }}>
         <UseScroll
             hover={id === classNameID}
@@ -93,6 +114,7 @@ function CoreScroll({
         >
             <UseTouch
                 hover={id === classNameID}
+                id={id}
                 set={touch}
             >
                 <div
@@ -100,24 +122,7 @@ function CoreScroll({
                     id={ID_SCROLLBAR}
                     className={String(id)}
                     ref={ref}
-                    onMouseMove={e => {
-                        if (props.direction !== direction)
-                            return
-
-                        if (new Date().getTime() - setDefault.id < 2)
-                            return
-
-                        setDefault = {
-                            id: new Date().getTime(),
-                            children: e.currentTarget
-                        }
-
-                        setValue(prev => {
-                            prev.id = String(id)
-                            console.log(`set on ${prev.id} ${props.direction} ${direction}`)
-                            return { ...prev }
-                        })
-                    }}
+                    onMouseMove={handlerScroll}
                 >
                     <ScrollBar />
                     <PageSizeCore>
@@ -159,7 +164,13 @@ export const ScrollLayer = ({
     const [value, setValue] = useState<ScrollLayerDataProps>({
         id: '0',
         scroll: false,
-        direction: 'y'
+        direction: 'y',
+        start: {
+            x: 0,
+            y: 0
+        },
+        focus: false,
+        focusID: '0'
     })
 
     useEffect(() => {

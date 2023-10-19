@@ -53,19 +53,6 @@ export default function UseScroll({
         })
     }
 
-    // useEffect(() => {
-    //     setProps(prev => {
-    //         prev[direction] = limit(
-    //             direction,
-    //             prev[direction] + touch[direction] + 2,
-    //             prev.inner,
-    //             prev.outer
-    //         )
-
-    //         return { ...prev }
-    //     })
-    // }, [touch.x, touch.y, direction])
-
     useEffect(() => {
         setProps(prev => {
             prev.setScroll = setScroll

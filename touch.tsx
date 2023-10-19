@@ -10,6 +10,7 @@ import {
 } from "./core"
 
 
+
 type touchProps = {
     x: number
     y: number
@@ -19,16 +20,18 @@ interface UseTouchProps {
     children: React.ReactNode
     hover: boolean
     set: boolean
+    id: string
 }
 
 export default function UseTouch({
     children,
     hover,
-    set
+    set,
+    id
 }: UseTouchProps) {
     const { props } = useContext(ScrollContext)
 
-    const { value } = useContext(LayerScrollContext)
+    const { value, setValue } = useContext(LayerScrollContext)
     const { scroll } = value
 
     const { x, y, setScroll, direction } = props
@@ -39,6 +42,42 @@ export default function UseTouch({
         x: 0,
         y: 0
     })
+
+    useEffect(() => {
+        if (!hover)
+            return
+
+        if(value.direction !== direction)
+            return
+        
+        if (!value.focus)
+            return
+
+        if(value.focusID !== '0')
+            return
+
+        setTouch(prev => {
+            const { x, y } = value.start
+            prev.x = x
+            prev.y = y
+            return { ...prev }
+        })
+        setValue(prev => {
+            prev.focusID = id
+            return {...prev}
+        })
+        setMove(true)
+    }, [hover, value.direction, direction, value.focus])
+
+    useEffect(() => {
+        if(!hover)
+            return
+
+        if(value.focus)
+            return
+
+        setMove(false)
+    }, [hover, value.focus])
 
     useEffect(() => {
         if (!set)
@@ -67,25 +106,8 @@ export default function UseTouch({
             })
         }
 
-        const init = ({ clientX, clientY }: MouseEvent) => {
-            if (!hover)
-                return
-
-            setMove(true)
-            setTouch({ x: clientX, y: clientY })
-        }
-
-        const reset = () => setMove(false)
-
-        window.addEventListener('mousedown', init)
-        window.addEventListener('mouseup', reset)
         window.addEventListener('mousemove', handler)
-
-        return () => {
-            window.removeEventListener('mousedown', init)
-            window.removeEventListener('mouseup', reset)
-            window.removeEventListener('mousemove', handler)
-        }
+        return () => window.removeEventListener('mousemove', handler)
     }, [move, y, touch, hover, scroll])
 
     return children
